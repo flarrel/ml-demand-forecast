@@ -23,11 +23,17 @@ Observed response for the published dataset snapshot:
 {
   "history_through_week": "2011-11-28",
   "forecast_week": "2011-12-05",
-  "model_version": "b3a55adf1d821d0a",
-  "method": "four_week_mean",
+  "model_version": "ba631f7cd8a116b3",
+  "method": "robust_rolling",
   "forecasts": [
-    {"sku": "85123A", "units": 888.75},
-    {"sku": "84879", "units": 1266.0}
+    {
+      "sku": "85123A",
+      "units": 670.575
+    },
+    {
+      "sku": "84879",
+      "units": 903.625
+    }
   ]
 }
 ```
@@ -44,5 +50,5 @@ model once at startup. Restart it after rebuilding the artifacts. It rejects an
 artifact built against a different weekly panel.
 
 An Apple Silicon loopback run with a warm, persistent connection and 25 SKUs
-per request measured **0.77 ms median** and **0.91 ms p95** over 100 sequential
-requests after 10 warmups. The result describes that local baseline run.
+per request measured **0.80 ms median** and **1.01 ms p95** over 100 sequential
+requests after 10 warmups. The result describes that local rolling-forecast run.

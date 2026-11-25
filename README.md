@@ -20,6 +20,7 @@ python -m pip --cache-dir .cache/pip --disable-pip-version-check install -r requ
 curl -fL --retry 2 'https://archive.ics.uci.edu/static/public/352/online+retail.zip' \
   -o work/online-retail.zip
 python -m forecast.data
+python -m forecast.data --sku-offset 25 --output work/confirmation
 python -m forecast.model
 python -m unittest discover -s tests -v
 python -m uvicorn forecast.service:app --host 127.0.0.1 --port 8000
@@ -41,18 +42,19 @@ sample output, and failure scenarios.
 
 ## Evaluation
 
-The eight-week holdout from October 10 through November 28, 2011 contains 200
-SKU-week forecasts. Lower values are better.
+The release compares the robust rolling forecast with the four-week average,
+the baseline selected during development. Each evaluation below covers eight
+weeks and 200 SKU-week forecasts.
 
-- **Four-week average:** 293.35 units mean absolute error (MAE), 52.43% weighted
-  absolute percentage error (WAPE).
-- **Last week:** 364.12 units MAE, 65.07% WAPE.
-- **Gradient boosting:** 348.33 units MAE, 62.25% WAPE.
+- **Original period replay:** MAE fell from 293.35 to 271.11 units (**7.58%**).
+  WAPE fell from 52.43% to 48.45%.
+- **25 additional SKUs:** MAE fell from 173.19 to 149.34 units (**13.77%**).
+  WAPE fell from 62.20% to 53.64%. These SKUs were excluded from candidate
+  selection and are from the same retailer and dates.
 
-The release rule required the boosted model to reduce MAE by at least 5% over
-the baseline selected during development. Its holdout MAE was 18.74% higher, so
-the release artifact serves the four-week average. The four-week average also
-had lower MAE in both SKU-volume groups.
+The robust rolling forecast exceeded the 5% MAE improvement target on both
+checks and is the method served by the API. Gradient boosting remains in the
+evaluation as a comparator.
 
 The model command generates a release artifact, validation and holdout metrics,
 and row-level predictions in `work/`. You can compare a run with the committed

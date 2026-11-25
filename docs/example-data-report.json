@@ -13,6 +13,7 @@
   "last_complete_week": "2011-11-28",
   "sku_selection_through": "2011-05-30",
   "weeks": 52,
+  "sku_rank_start": 1,
   "skus": 25,
   "panel_rows": 1300,
   "panel_units": 684789,

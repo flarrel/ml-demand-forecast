@@ -11,11 +11,16 @@
       "mae": 262.48055555555555,
       "wape": 0.5686676424001117
     },
+    "robust_rolling": {
+      "mae": 237.28472222222223,
+      "wape": 0.5140805317105346
+    },
     "gradient_boosting": {
       "mae": 315.0264086671779,
       "wape": 0.6825089375910781
     }
   },
+  "holdout_kind": "replay_of_previously_evaluated_primary_weeks",
   "holdout_start": "2011-10-10",
   "holdout_end": "2011-11-28",
   "holdout_rows": 200,
@@ -27,6 +32,10 @@
     "four_week_mean": {
       "mae": 293.35,
       "wape": 0.5242511973693617
+    },
+    "robust_rolling": {
+      "mae": 271.107125,
+      "wape": 0.48450054507112733
     },
     "gradient_boosting": {
       "mae": 348.3343353945652,
@@ -45,6 +54,10 @@
           "mae": 447.29296875,
           "wape": 0.46437319534114135
         },
+        "robust_rolling": {
+          "mae": 437.25078124999993,
+          "wape": 0.4539475391752911
+        },
         "gradient_boosting": {
           "mae": 499.6017144659433,
           "wape": 0.518679390809142
@@ -62,6 +75,10 @@
           "mae": 220.90625,
           "wape": 0.5976853141288346
         },
+        "robust_rolling": {
+          "mae": 192.921875,
+          "wape": 0.5219706163211714
+        },
         "gradient_boosting": {
           "mae": 277.149686419799,
           "wape": 0.7498579030177986
@@ -69,11 +86,38 @@
       }
     }
   },
+  "confirmation": {
+    "kind": "disjoint_skus_same_retailer_and_holdout_weeks",
+    "skus": 25,
+    "rows": 200,
+    "scores": {
+      "last_week": {
+        "mae": 219.58,
+        "wape": 0.7886504444643979
+      },
+      "four_week_mean": {
+        "mae": 173.18625,
+        "wape": 0.6220211906258418
+      },
+      "robust_rolling": {
+        "mae": 149.33625,
+        "wape": 0.5363607793840351
+      },
+      "gradient_boosting": {
+        "mae": 232.2051674489714,
+        "wape": 0.8339953935493272
+      }
+    }
+  },
   "release": {
+    "candidate": "robust_rolling",
     "validation_selected_baseline": "four_week_mean",
     "required_mae_reduction": 0.05,
-    "observed_mae_reduction": -0.18743594816623532,
-    "candidate_passed": false,
-    "selected": "four_week_mean"
+    "observed_mae_reduction": 0.07582367479120511,
+    "confirmation_mae_reduction": 0.1377130112812074,
+    "replay_passed": true,
+    "confirmation_passed": true,
+    "candidate_passed": true,
+    "selected": "robust_rolling"
   }
 }

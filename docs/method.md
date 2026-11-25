@@ -22,26 +22,35 @@ contains 1,300 rows across 25 SKUs and 52 weeks, with 55 zero-sales rows.
 
 ## Forecast and evaluation
 
-The target is next-week units sold for an eligible SKU. The candidate is a single
-histogram gradient-boosted regression model shared by all SKUs. It uses lagged
-units from one, two, and four weeks prior, an eight-week mean, and a four-week
-mean and standard deviation. Each feature ends before the forecast week starts.
-The two baselines carry the previous week's units forward or average the previous
-four weeks.
+The target is next-week units sold for an eligible SKU. The rolling forecast
+combines the 40th percentile of the previous 12 weeks (75% weight) with the
+median of the previous four weeks (25% weight). The longer window reduces the
+influence of unusually large sales weeks, and the shorter window responds to
+recent changes. Both windows end before the forecast week begins.
 
-Development uses 18 rolling weekly origins. At each origin, the candidate fits
-only on earlier weeks and forecasts all 25 SKUs. The lower-MAE baseline from
-these origins becomes the release comparator. For the final eight weeks, the
-candidate is fitted once on the pre-holdout portion. Previously observed sales
-can update lag features as the holdout window advances. The held-out results
-are compared after the feature definitions, estimator, and release rule
-are fixed.
+The two baselines carry the previous week's units forward or average the
+previous four weeks. The pooled histogram gradient-boosted comparator uses
+lags, rolling means, and rolling volatility. During development it fits only
+on weeks before each of the 18 rolling forecast origins. For the final eight
+weeks, it is fitted once on the pre-holdout portion. All forecasters can use
+sales already observed before the next forecast origin.
 
-MAE measures the typical error in units per SKU-week. WAPE divides total absolute
-error by total realized sales volume and is undefined when realized sales are
-zero across the evaluation group. We also report errors for the top third of
-SKUs by selection-period volume and for the remaining SKUs. The baseline is
-served whenever the candidate misses the 5% relative MAE improvement target.
+The four-week average was selected from the two baselines by development MAE.
+Candidate selection compared rolling statistics and fitted regressors on the
+original 25 SKUs' development weeks. The final rolling formula was fixed
+before its confirmation on SKU ranks 26–50, based on the same first 26
+complete weeks used to rank the original products. The original holdout had
+already been evaluated in a prior run, so the report labels its new score as
+a replay. Confirmation uses previously unevaluated products from the same
+retailer and calendar dates.
+
+MAE measures mean error magnitude in units per SKU-week. WAPE divides total
+absolute error by total realized sales volume and is undefined when realized
+sales are zero across the evaluation group. The report includes the original
+top third of SKUs by selection-period volume and the remaining original SKUs.
+The rolling candidate must improve aggregate MAE by at least 5% over the
+four-week average on both the replay and the additional SKUs. The service
+falls back to the baseline if either check fails.
 
 ## Research and retail context
 
@@ -53,8 +62,8 @@ idea at one retailer and one aggregation level. [Makridakis et al., M5 Accuracy 
 
 A follow-up compared the characteristics of Walmart's M5 series with two other
 retailers. Differences in demand patterns and aggregation are reasons to test
-transfer on the source at hand. Here, the baseline beat the pooled candidate
-across both evaluated SKU-volume groups. [Theodorou et al., M5 representativeness](https://arxiv.org/html/2103.02941)
+transfer on the source at hand. Here, the rolling forecast had the lowest MAE
+in both original SKU-volume groups. [Theodorou et al., M5 representativeness](https://arxiv.org/html/2103.02941)
 
 Walmart's forecasting discussion treats accuracy and uncertainty as inputs to
 operational decisions. Its separate demand-sensing case illustrates the use of
