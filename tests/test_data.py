@@ -34,7 +34,7 @@ class DataTests(unittest.TestCase):
         self.assertTrue(panel["units"].eq(2).all())
 
     def test_digest_rejects_unexpected_archive(self):
-        with tempfile.TemporaryDirectory(dir=".cache") as directory:
+        with tempfile.TemporaryDirectory(dir=".") as directory:
             archive = Path(directory) / "source.zip"
             archive.write_bytes(b"wrong bytes")
             with self.assertRaisesRegex(ValueError, "Unexpected source SHA-256"):
