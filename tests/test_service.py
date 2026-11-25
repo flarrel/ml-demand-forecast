@@ -8,7 +8,7 @@ import joblib
 import numpy as np
 import pandas as pd
 
-from forecast.model import MODEL, fit_tree, make_features, panel_digest
+from forecast.model import MODEL, ROBUST, fit_tree, make_features, panel_digest
 from forecast.service import create_app
 
 
@@ -49,6 +49,18 @@ class ServiceTests(unittest.TestCase):
                 {"sku": "20000", "units": 133.5},
                 {"sku": "10000", "units": 33.5},
             ])
+
+    def test_robust_forecast_uses_the_same_formula_as_evaluation(self):
+        self.write_artifact(ROBUST)
+        with TestClient(create_app(self.directory)) as client:
+            result = client.post("/v1/forecasts", json={
+                "forecast_week": self.week, "skus": ["10000", "20000"],
+            })
+        self.assertEqual(result.status_code, 200)
+        self.assertEqual(result.json()["method"], ROBUST)
+        np.testing.assert_allclose(
+            [item["units"] for item in result.json()["forecasts"]], [29.675, 129.675]
+        )
 
     def test_validation_rejects_stale_week_duplicate_and_unknown_sku(self):
         self.write_artifact("four_week_mean")

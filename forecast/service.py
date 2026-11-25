@@ -13,10 +13,10 @@ import numpy as np
 import pandas as pd
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
-from forecast.model import BASELINES, MODEL, WEEK, make_features, predict_tree, read_panel
+from forecast.model import MODEL, ROLLING_METHODS, WEEK, make_features, predict_tree, read_panel
 
 Sku = Annotated[str, StringConstraints(pattern=r"^[0-9]{5}[A-Z]{0,2}$")]
-Method = Literal["last_week", "four_week_mean", "gradient_boosting"]
+Method = Literal["last_week", "four_week_mean", "gradient_boosting", "robust_rolling"]
 
 
 class ForecastRequest(BaseModel):
@@ -51,7 +51,7 @@ def create_app(workdir=Path("work")):
         artifact_bytes = (workdir / "forecaster.joblib").read_bytes()
         # Joblib artifacts must come from our own local training run.
         artifact = joblib.load(BytesIO(artifact_bytes))
-        if artifact.get("schema") != 1 or artifact.get("method") not in (*BASELINES, MODEL):
+        if artifact.get("schema") != 1 or artifact.get("method") not in (*ROLLING_METHODS, MODEL):
             raise ValueError("Unsupported forecaster artifact")
         if artifact["method"] == MODEL and artifact.get("model") is None:
             raise ValueError("Boosted forecaster is missing its trained model")
@@ -101,7 +101,7 @@ def create_app(workdir=Path("work")):
         if snapshot.method == MODEL:
             units = predict_tree(app.state.model, batch)
         else:
-            units = batch[BASELINES[snapshot.method]].to_numpy()
+            units = batch[ROLLING_METHODS[snapshot.method]].to_numpy()
         return ForecastResponse(
             **snapshot.model_dump(),
             forecasts=[ForecastItem(sku=sku, units=value)
