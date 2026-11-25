@@ -1,7 +1,7 @@
 # Replenishment batch integration
 
-The batch client models the caller in a local replenishment workflow. It
-requests quantities in one batch and emits JSON for a downstream planner.
+The batch client requests one-week-ahead sales forecasts for multiple SKUs
+and writes the response as JSON for downstream replenishment planning.
 
 1. Check `GET /health` for readiness.
 2. Read `GET /v1/catalog` for the available forecast week's Monday date, SKU
@@ -41,7 +41,7 @@ Observed response for the published dataset snapshot:
 A stale forecast week, duplicate SKU, unsupported SKU, or invalid payload gets
 HTTP 422. The command exits with code 1 and writes the error to stderr for HTTP
 errors, invalid responses, or connection failures. A failed execution leaves
-stdout empty so downstream jobs can distinguish it from a successful batch.
+stdout empty so the calling process can distinguish it from a successful batch.
 
 As a smoke test, run the README example with `99999` as the only SKU and check for
 HTTP 422. Stop the service and repeat the successful example to check that the

@@ -1,9 +1,9 @@
 # Weekly Sales Forecast
 
-Weekly Sales Forecast gives a replenishment batch job a one-week-ahead unit-sales
-forecast for 25 selected products. It turns public retail transactions into a
-weekly panel, compares candidate and baseline forecasters, and serves the method
-selected by the release rule through a local HTTP API.
+Weekly Sales Forecast predicts next week's units sold for 25 products. It
+aggregates retail transactions by product and week, evaluates forecasting
+methods, and serves the selected method over HTTP. A batch client returns
+versioned forecasts as JSON for replenishment planning.
 
 ## Run locally
 
@@ -34,11 +34,11 @@ curl -fsS http://127.0.0.1:8000/v1/catalog
 .venv/bin/python -m forecast.batch --week 2011-12-05 85123A 84879
 ```
 
-The service uses a historical snapshot ending in the week of November 28, 2011.
-December 5, 2011 is the start of the forecast week in this demonstration. The source also
-contains a partial week beginning December 5, which is excluded from training and
-scoring. See the [batch integration guide](docs/integration.md) for the contract,
-sample output, and failure scenarios.
+The last complete week in the snapshot starts November 28, 2011. The API
+forecasts the following week, starting December 5. The source's partial
+December 5 week is excluded from training and scoring. See the
+[batch integration guide](docs/integration.md) for the API contract, sample
+output, and error handling.
 
 ## Evaluation
 
@@ -49,8 +49,8 @@ weeks and 200 SKU-week forecasts.
 - **Original period replay:** MAE fell from 293.35 to 271.11 units (**7.58%**).
   WAPE fell from 52.43% to 48.45%.
 - **25 additional SKUs:** MAE fell from 173.19 to 149.34 units (**13.77%**).
-  WAPE fell from 62.20% to 53.64%. These SKUs were excluded from candidate
-  selection and are from the same retailer and dates.
+  WAPE fell from 62.20% to 53.64%. These products share the retailer and dates
+  of the original evaluation and were held out during model selection.
 
 The robust rolling forecast exceeded the 5% MAE improvement target on both
 checks and is the method served by the API. Gradient boosting remains in the

@@ -36,7 +36,7 @@ weeks, it is fitted once on the pre-holdout portion. All forecasters can use
 sales already observed before the next forecast origin.
 
 The four-week average was selected from the two baselines by development MAE.
-Candidate selection compared rolling statistics and fitted regressors on the
+Model selection compared rolling statistics and fitted regressors on the
 original 25 SKUs' development weeks. The final rolling formula was fixed
 before its confirmation on SKU ranks 26–50, based on the same first 26
 complete weeks used to rank the original products. The original holdout had
@@ -48,7 +48,7 @@ MAE measures mean error magnitude in units per SKU-week. WAPE divides total
 absolute error by total realized sales volume and is undefined when realized
 sales are zero across the evaluation group. The report includes the original
 top third of SKUs by selection-period volume and the remaining original SKUs.
-The rolling candidate must improve aggregate MAE by at least 5% over the
+The rolling forecast must improve aggregate MAE by at least 5% over the
 four-week average on both the replay and the additional SKUs. The service
 falls back to the baseline if either check fails.
 
@@ -56,7 +56,7 @@ falls back to the baseline if either check fails.
 
 The M5 Accuracy study found that models trained across aligned product series
 were common among the strongest submissions. Its findings on cross-learning,
-benchmarks, and temporal validation motivated the pooled boosted candidate and
+benchmarks, and temporal validation motivated the pooled boosted model and
 explicit comparisons against simple weekly methods. The project tests that
 idea at one retailer and one aggregation level. [Makridakis et al., M5 Accuracy results](https://www.sciencedirect.com/science/article/pii/S0169207021001874)
 
