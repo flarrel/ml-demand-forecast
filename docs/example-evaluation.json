@@ -1,0 +1,79 @@
+{
+  "validation_start": "2011-06-06",
+  "validation_end": "2011-10-03",
+  "validation_rows": 450,
+  "validation": {
+    "last_week": {
+      "mae": 305.08666666666664,
+      "wape": 0.6609743532957484
+    },
+    "four_week_mean": {
+      "mae": 262.48055555555555,
+      "wape": 0.5686676424001117
+    },
+    "gradient_boosting": {
+      "mae": 315.0264086671779,
+      "wape": 0.6825089375910781
+    }
+  },
+  "holdout_start": "2011-10-10",
+  "holdout_end": "2011-11-28",
+  "holdout_rows": 200,
+  "holdout": {
+    "last_week": {
+      "mae": 364.115,
+      "wape": 0.6507166344985346
+    },
+    "four_week_mean": {
+      "mae": 293.35,
+      "wape": 0.5242511973693617
+    },
+    "gradient_boosting": {
+      "mae": 348.3343353945652,
+      "wape": 0.6225147176255722
+    }
+  },
+  "holdout_by_volume": {
+    "higher_volume": {
+      "rows": 64,
+      "scores": {
+        "last_week": {
+          "mae": 532.609375,
+          "wape": 0.5529474742886805
+        },
+        "four_week_mean": {
+          "mae": 447.29296875,
+          "wape": 0.46437319534114135
+        },
+        "gradient_boosting": {
+          "mae": 499.6017144659433,
+          "wape": 0.518679390809142
+        }
+      }
+    },
+    "other": {
+      "rows": 136,
+      "scores": {
+        "last_week": {
+          "mae": 284.8235294117647,
+          "wape": 0.7706203000039789
+        },
+        "four_week_mean": {
+          "mae": 220.90625,
+          "wape": 0.5976853141288346
+        },
+        "gradient_boosting": {
+          "mae": 277.149686419799,
+          "wape": 0.7498579030177986
+        }
+      }
+    }
+  },
+  "release": {
+    "validation_selected_baseline": "four_week_mean",
+    "required_mae_reduction": 0.05,
+    "observed_mae_reduction": -0.18743594816623532,
+    "candidate_passed": false,
+    "selected": "four_week_mean"
+  }
+}
