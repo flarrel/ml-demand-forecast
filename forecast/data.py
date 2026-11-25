@@ -30,7 +30,7 @@ def positive_number(value):
     return isinstance(value, (int, float)) and math.isfinite(value) and value > 0
 
 
-def build_panel(rows):
+def build_panel(rows, sku_offset=0):
     counts = Counter()
     totals = Counter()
     accepted_by_week = Counter()
@@ -75,9 +75,10 @@ def build_panel(rows):
     for (week, sku), units in totals.items():
         if first_week <= week <= selection_end:
             eligible[sku] += units
-    skus = sorted(eligible, key=lambda sku: (-eligible[sku], sku))[:SKU_LIMIT]
+    ranked_skus = sorted(eligible, key=lambda sku: (-eligible[sku], sku))
+    skus = ranked_skus[sku_offset:sku_offset + SKU_LIMIT]
     if not skus:
-        raise ValueError("No eligible merchandise during SKU selection")
+        raise ValueError("No eligible merchandise for the requested SKU ranks")
 
     panel = pd.DataFrame(
         [(week, sku, totals[week, sku]) for week in weeks for sku in skus],
@@ -95,6 +96,7 @@ def build_panel(rows):
         "last_complete_week": last_week.isoformat(),
         "sku_selection_through": selection_end.isoformat(),
         "weeks": len(weeks),
+        "sku_rank_start": sku_offset + 1,
         "skus": len(skus),
         "panel_rows": len(panel),
         "panel_units": int(panel["units"].sum()),
@@ -103,7 +105,7 @@ def build_panel(rows):
     return panel, report
 
 
-def prepare(archive, output):
+def prepare(archive, output, sku_offset=0):
     with archive.open("rb") as source:
         observed_sha256 = file_digest(source, "sha256").hexdigest()
     if observed_sha256 != SOURCE_SHA256:
@@ -117,7 +119,7 @@ def prepare(archive, output):
             rows = workbook.worksheets[0].iter_rows(values_only=True)
             if next(rows, None) != HEADERS:
                 raise ValueError("Unexpected Online Retail column schema")
-            panel, report = build_panel(rows)
+            panel, report = build_panel(rows, sku_offset)
         finally:
             workbook.close()
 
@@ -133,8 +135,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--archive", type=Path, default=Path("work/online-retail.zip"))
     parser.add_argument("--output", type=Path, default=Path("work"))
+    parser.add_argument("--sku-offset", type=int, choices=(0, SKU_LIMIT), default=0)
     args = parser.parse_args()
-    print(json.dumps(prepare(args.archive, args.output), indent=2))
+    print(json.dumps(prepare(args.archive, args.output, args.sku_offset), indent=2))
 
 
 if __name__ == "__main__":

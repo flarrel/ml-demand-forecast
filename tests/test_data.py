@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from forecast.data import build_panel, prepare
 
@@ -32,6 +33,23 @@ class DataTests(unittest.TestCase):
         self.assertEqual(report["last_complete_week"], "2020-08-17")
         self.assertEqual(set(panel["sku"]), {"10000"})
         self.assertTrue(panel["units"].eq(2).all())
+
+    def test_confirmation_products_are_ranked_on_selection_weeks(self):
+        first = datetime(2020, 1, 6)
+        rows = [
+            (str(i), sku, None, units, first + timedelta(weeks=i), 1, None, None)
+            for i in range(34)
+            for sku, units in (("10000", 12), ("20000", 6), ("30000", 2))
+        ]
+        rows.append(("99", "30000", None, 10000, first + timedelta(weeks=32), 1, None, None))
+
+        with patch("forecast.data.SKU_LIMIT", 1):
+            primary, _ = build_panel(rows)
+            confirmation, report = build_panel(rows, sku_offset=1)
+
+        self.assertEqual(set(primary["sku"]), {"10000"})
+        self.assertEqual(set(confirmation["sku"]), {"20000"})
+        self.assertEqual(report["sku_rank_start"], 2)
 
     def test_digest_rejects_unexpected_archive(self):
         with tempfile.TemporaryDirectory(dir=".") as directory:
